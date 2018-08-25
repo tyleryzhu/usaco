@@ -41,10 +41,8 @@ bool LinesIntersect (PT a, PT b, PT c, PT d){
 }
 
 bool contained_in(PT cow, const vector<PT> &poly){ //receive a cow, and the vertices of a polygon    
-    //Pick a large random point so that Probability of bad cases is ~~ 0 
-    PT cow2; 
-    cow2.x = rand() % 1000 - 1000; 
-    cow2.y = rand() % 1000 - 1000; 
+    //Pick (-1, cow.y+1) so that Probability of bad cases is = 0 (since all points on this line seg. are non-integer)
+    PT cow2 = PT(-1, cow.y+1); 
     int tot = 0; 
     for (int i = 0; i<poly.size()-1; i++){
         if (LinesIntersect(cow, cow2, poly[i], poly[i+1])) tot++; 
@@ -57,8 +55,8 @@ int main() {
     /** Step 0: Receive input by using maps so that we can trace the polygons and find out the vertices 
      *          We have be careful of directions though, b/c if we have (a,b,c,d) but a->b and c->b, then 
      *          c -> d won't work b/c a->b is screwed then, so we'll need to do some iffy stuff to account for it **/ 
-    /**         One way of accounting for this is to check the head of every arrow we insert into our map 
-     *          and see if it's the head of some other arrow. If so, we backpropagate until all the arrows 
+    /**         One way of accounting for this is to check the tail of every arrow we insert into our map 
+     *          and see if it's the tail of some other arrow. If so, we backpropagate until all the arrows 
      *          are the right direction. Kinda adhoc-y but its really not too bad           **/ 
     int N, C; 
     cin >> N >> C; 
@@ -107,6 +105,7 @@ int main() {
         mymap.erase(two);  
         polyCt++; //increment
     }
+	
     /** Step 2: Receive cows, and create an ID for each based on if it is contained in polygon i **/
     vector<PT> cows(C); 
     for (int i = 0; i<C; i++){
@@ -125,11 +124,10 @@ int main() {
     map<string, int> com; 
     int best = 0; 
     for (int i = 0; i<C; i++){
-        if (com.insert(make_pair(cows[i].ID, 0)).second == false) { //already in map 
-            com[cows[i].ID]++; 
+        if (com.count(cows[i]) == 0) { //not in map yet
+            com[cows[i].ID = 0; 
         }
-        else com[cows[i].ID] = 1; 
-        best = max(best, com[cows[i].ID]); 
+        best = max(best, com[cows[i].ID]++); 
     }
     
     /** Step 4: Output Answer **/ 
